@@ -1,3 +1,7 @@
+TODO: AVRO completion
+	  topic as argument ==> default is test
+	  first lines of application: warning -- be sure everything is running...
+
 **Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
 
 When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
