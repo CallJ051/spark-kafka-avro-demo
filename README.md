@@ -4,9 +4,10 @@ This Java example how to produce and consume data to and from Kafka. Data is ser
 The use case in this example is the processing of transactions. These are sent to a Kafka stream using random intervals (max. 5 seconds). Another process calculates the sum per distributor over a 3 second window and stores the ongoing accumulation in another file.
 This process should pick up where it left off in case it crashes and needs to restart.
 
-# Resources
+## Resources
 
 The **resources** directory contains the following files:
+
 1. transactions.csv: the transactions
 2. assignment.docx: the complete assignment
 3. output.csv: an output example
@@ -17,6 +18,7 @@ To generate the jar, execute the following Maven command in the cloned directory
 ´mvn clean compile assembly:single´
 
 The **src/main/java/myapp** directory contains four .java files:
+
 1. App.java: contains UI-logic
 2. MyAvroSparkProducer.java: implementation of the producer
 3. MyAvroSparkConsumer.java: implementation of the consumer
@@ -36,36 +38,41 @@ The default producer and consumer properties used in this example can be found i
 
 ---
 
-# Start Zookeeper
-$ bin/zookeeper-server-start config/zookeeper.properties
-
-# Start Kafka
-$ bin/kafka-server-start config/server.properties
-
-# Start Schema Registry
-$ bin/schema-registry-start config/schema-registry.properties
-If you don't already have a schema registry, you will need to install it. Either from packages: http://www.confluent.io/developer Or from source: https://github.com/confluentinc/schema-registry
-
-Then create a topic called clicks:
-
-# Create page_visits topic
-$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 \
-  --partitions 1 --topic clicks
-Then run the producer to produce 100 clicks:
-
-$ java -cp target/uber-ClickstreamGenerator-1.0-SNAPSHOT.jar com.shapira.examples.producer.avroclicks.AvroClicksProducer 100 http://localhost:8081
-You can validate the result by using the avro console consumer (part of the schema repository):
-
-$ bin/kafka-avro-console-consumer --zookeeper localhost:2181 --topic clicks --from-beginning
-
-
-## Edit a file
-
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+# Start Zookeeper and Kafka
+Execute following commands in your %kafka_home% directory.
 
 1. `> cd %KAFKA_HOME%`
 2. `> bin\windows\zookeeper-server-start config\zookeeper.properties`
 3. `> bin\windows\kafka-server-start.bat config\server.properties`
-4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic **topic**`
-5. java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type producer
-6. java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type consumer
+4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic
+`In this example, we create a topic called **demo_topic**
+
+
+# Start producer and consumer
+
+5. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type producer`
+
+6. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type consumer`
+
+
+## Usage
+`>java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar`
+
+`usage: spark-kafka-demo-app`
+
+ `-c,--checkpoint <arg>   The checkpoint option: path of directory used to
+                         save the consumer state`
+                         
+ `-i,--input <arg>        The input option: path of file containing the
+                         transactions`
+                         
+ `-o,--output <arg>       The output option: path of file used to save the
+                         aggregations`
+ `-p,--properties <arg>   The properties option: path of file containing
+                         additional streaming properties to overwrite
+                         default consumer or producer properties`
+                         
+ `-s,--type <arg>         The stream type option - possible tyes:
+                         'consumer','producer'`
+                         
+ `-t,--topic <arg>        The topic option: a kafka topic`
