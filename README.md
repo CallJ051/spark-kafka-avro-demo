@@ -1,49 +1,71 @@
-TODO: AVRO completion
-	  topic as argument ==> default is test
-	  first lines of application: warning -- be sure everything is running...
+# Processing transactions using Kafka, Spark and Avro
 
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+This Java example how to produce and consume data to and from Kafka. Data is serialized and deserialized using Avro. Apache Spark is used to process the data before sending it to and when reading from the Kafka data stream.
+The use case in this example is the processing of transactions. These are sent to a Kafka stream using random intervals (max. 5 seconds). Another process calculates the sum per distributor over a 3 second window and stores the ongoing accumulation in another file.
+This process should pick up where it left off in case it crashes and needs to restart.
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+# Resources
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+The **resources** directory contains the following files:
+1. transactions.csv: the transactions
+2. assignment.docx: the complete assignment
+3. output.csv: an output example
+
+This project is built and packaged using Maven 3.3.9.
+The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
+To generate the jar, execute the following Maven command in the cloned directory: 
+´mvn clean compile assembly:single´
+
+The **src/main/java/myapp** directory contains four .java files:
+1. App.java: contains UI-logic
+2. MyAvroSparkProducer.java: implementation of the producer
+3. MyAvroSparkConsumer.java: implementation of the consumer
+4. Util.java: A utility class containing the used Avro schema
+
+## Prerequisites
+- Java 8 (or higher)
+- For Windows users: install the hadoop winutils and [add them to your class path](https://stackoverflow.com/questions/18630019/running-apache-hadoop-2-1-0-on-windows)
+- [A Kafka installation (1.1.0) ](https://kafka.apache.org/quickstart)
+
+The **pom.xml** contains all Java dependencies. This manual assumes the user runs the examples in a Windows (10) environment. If you use another OS, I refer you to the Kafka documentations for the correct commands to setup your Kafka server.
+
+Before running the example, make sure that Zookeeper and Kafka. In what follows, we assume that Zookeeper, Kafka and Schema Registry are started with the default settings. 
+These can also be found in the **kafka_properties** directory.
+
+The default producer and consumer properties used in this example can be found in **src\main\resources** 
 
 ---
+
+# Start Zookeeper
+$ bin/zookeeper-server-start config/zookeeper.properties
+
+# Start Kafka
+$ bin/kafka-server-start config/server.properties
+
+# Start Schema Registry
+$ bin/schema-registry-start config/schema-registry.properties
+If you don't already have a schema registry, you will need to install it. Either from packages: http://www.confluent.io/developer Or from source: https://github.com/confluentinc/schema-registry
+
+Then create a topic called clicks:
+
+# Create page_visits topic
+$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 \
+  --partitions 1 --topic clicks
+Then run the producer to produce 100 clicks:
+
+$ java -cp target/uber-ClickstreamGenerator-1.0-SNAPSHOT.jar com.shapira.examples.producer.avroclicks.AvroClicksProducer 100 http://localhost:8081
+You can validate the result by using the avro console consumer (part of the schema repository):
+
+$ bin/kafka-avro-console-consumer --zookeeper localhost:2181 --topic clicks --from-beginning
+
 
 ## Edit a file
 
 You’ll start by editing this README file to learn how to edit a file in Bitbucket.
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
-
----
-
-## Create a file
-
-Next, you’ll add a new file to this repository.
-
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
-
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
-
----
-
-## Clone a repository
-
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
-
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
-
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+1. `> cd %KAFKA_HOME%`
+2. `> bin\windows\zookeeper-server-start config\zookeeper.properties`
+3. `> bin\windows\kafka-server-start.bat config\server.properties`
+4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic **topic**`
+5. java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type producer
+6. java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type consumer
