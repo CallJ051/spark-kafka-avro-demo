@@ -31,7 +31,7 @@ The **src/main/java/myapp** directory contains four .java files:
 
 The **pom.xml** contains all Java dependencies. This manual assumes the user runs the examples in a Windows (10) environment. If you use another OS, I refer you to the Kafka documentations for the correct commands to setup your Kafka server.
 
-Before running the example, make sure that Zookeeper and Kafka. In what follows, we assume that Zookeeper, Kafka and Schema Registry are started with the default settings. 
+Before running the example, make sure that Zookeeper and Kafka. In what follows, we assume that Zookeeper and Kafka are started with the default settings. 
 These can also be found in the **kafka_properties** directory.
 
 The default producer and consumer properties used in this example can be found in **src\main\resources** 
