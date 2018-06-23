@@ -8,9 +8,9 @@ This process should pick up where it left off in case it crashes and needs to re
 
 The **resources** directory contains the following files:
 
-1. transactions.csv: the transactions
-2. assignment.docx: the complete assignment
-3. output.csv: an output example
+1. ***transactions.csv***: the transactions
+2. ***assignment.pdf***: the complete assignment
+3. ***output.csv***: an output example
 
 This project is built and packaged using Maven 3.3.9.
 The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
@@ -19,10 +19,10 @@ To generate the jar, execute the following Maven command in the cloned directory
 
 The **src/main/java/myapp** directory contains four .java files:
 
-1. App.java: contains UI-logic
-2. MyAvroSparkProducer.java: implementation of the producer
-3. MyAvroSparkConsumer.java: implementation of the consumer
-4. Util.java: A utility class containing the used Avro schema
+1. ***App.java***: contains UI-logic
+2. ***MyAvroSparkProducer.java***: implementation of the producer
+3. ***MyAvroSparkConsumer.java***: implementation of the consumer
+4. ***Util.java***: A utility class containing the used Avro schema
 
 ## Prerequisites
 - Java 8 (or higher)
@@ -39,21 +39,23 @@ The default producer and consumer properties used in this example can be found i
 ---
 
 # Start Zookeeper and Kafka
-Execute following commands in your %kafka_home% directory.
+Execute following commands in your %kafka_home% directory. `> cd %KAFKA_HOME% `
 
-1. `> cd %KAFKA_HOME%`
-2. `> bin\windows\zookeeper-server-start config\zookeeper.properties`
-3. `> bin\windows\kafka-server-start.bat config\server.properties`
-4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic
-`In this example, we create a topic called **demo_topic**
+2. `> bin\windows\zookeeper-server-start config\zookeeper.properties` (in a seperate shell)
+3. `> bin\windows\kafka-server-start.bat config\server.properties` (in a seperate shell)
+4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic`
+
+In this example, we create a topic called **demo_topic**
 
 
-# Start producer and consumer
+# Start the producer and consumer
 
-5. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type producer`
+5.  `cd <directory cloned project>`
+6. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar -s consumer -c resources\checkpoint -o resources\results.csv -t demo_topic` (in a seperate shell)
+7. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar -s producer -i resources\transactions.csv -t demo_topic ` (in a seperate shell)
 
-6. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar  --type consumer`
-
+**resources\checkpoint** is a path to a non-existent folder which will be created in run time. The consumer will store its state in the checkpoint folder. If the process is killed and restarted with the same checkpoint folder,
+it will pick up where it left off.
 
 ## Usage
 `>java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar`
@@ -76,3 +78,19 @@ Execute following commands in your %kafka_home% directory.
                          'consumer','producer'`
                          
  `-t,--topic <arg>        The topic option: a kafka topic`
+ 
+ # Screenshots
+ 
+ ### Example output
+ 
+ ![picture](screenshots/example_output.png)
+ 
+ 
+ ### Restart consumer
+ 
+ ![picture](screenshots/consumer_continues_where_it_left_off.png)
+ 
+ 
+ ### Final state (all txs consumed)
+ 
+ ![picture](screenshots/final_state.png)
