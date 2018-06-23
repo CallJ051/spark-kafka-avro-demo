@@ -57,7 +57,25 @@ In this example, we create a topic called **demo_topic**
 **resources\checkpoint** is a path to a non-existent folder which will be created in run time. The consumer will store its state in the checkpoint folder. If the process is killed and restarted with the same checkpoint folder,
 it will pick up where it left off.
 
-## Usage
+
+# Screenshots
+ 
+ 
+### Example output
+ 
+![picture](screenshots/example_output.png)
+ 
+### Restart consumer
+ 
+![picture](screenshots/consumer_continues_where_it_left_off.png)
+ 
+ 
+### Final state (all txs consumed)
+ 
+![picture](screenshots/final_state.png)
+
+
+# Usage
 `>java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar`
 
 `usage: spark-kafka-demo-app`
@@ -79,18 +97,5 @@ it will pick up where it left off.
                          
  `-t,--topic <arg>        The topic option: a kafka topic`
  
- # Screenshots
  
- ### Example output
- 
- ![picture](screenshots/example_output.png)
- 
- 
- ### Restart consumer
- 
- ![picture](screenshots/consumer_continues_where_it_left_off.png)
- 
- 
- ### Final state (all txs consumed)
- 
- ![picture](screenshots/final_state.png)
+
