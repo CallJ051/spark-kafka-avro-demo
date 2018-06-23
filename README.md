@@ -1,45 +1,96 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+# Processing transactions using Kafka, Spark and Avro
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+This Java example how to produce and consume data to and from Kafka. Data is serialized and deserialized using Avro. Apache Spark is used to process the data before sending it to and when reading from the Kafka data stream.
+The use case in this example is the processing of transactions. These are sent to a Kafka stream using random intervals (max. 5 seconds). Another process calculates the sum per distributor over a 3 second window and stores the ongoing accumulation in another file.
+This process should pick up where it left off in case it crashes and needs to restart.
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+## Resources
+
+The **resources** directory contains the following files:
+
+1. ***transactions.csv***: the transactions
+2. ***assignment.pdf***: the complete assignment
+3. ***output.csv***: an output example
+
+This project is built and packaged using Maven 3.3.9.
+The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
+To generate the jar, execute the following Maven command in the cloned directory: 
+´mvn clean compile assembly:single´
+
+The **src/main/java/myapp** directory contains four .java files:
+
+1. ***App.java***: contains UI-logic
+2. ***MyAvroSparkProducer.java***: implementation of the producer
+3. ***MyAvroSparkConsumer.java***: implementation of the consumer
+4. ***Util.java***: A utility class containing the used Avro schema
+
+## Prerequisites
+- Java 8 (or higher)
+- For Windows users: install the hadoop winutils and [add them to your class path](https://stackoverflow.com/questions/18630019/running-apache-hadoop-2-1-0-on-windows)
+- [A Kafka installation (1.1.0) ](https://kafka.apache.org/quickstart)
+
+The **pom.xml** contains all Java dependencies. This manual assumes the user runs the examples in a Windows (10) environment. If you use another OS, I refer you to the Kafka documentations for the correct commands to setup your Kafka server.
+
+Before running the example, make sure that Zookeeper and Kafka. In what follows, we assume that Zookeeper, Kafka and Schema Registry are started with the default settings. 
+These can also be found in the **kafka_properties** directory.
+
+The default producer and consumer properties used in this example can be found in **src\main\resources** 
 
 ---
 
-## Edit a file
+# Start Zookeeper and Kafka
+Execute following commands in your %kafka_home% directory. `> cd %KAFKA_HOME% `
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+2. `> bin\windows\zookeeper-server-start config\zookeeper.properties` (in a seperate shell)
+3. `> bin\windows\kafka-server-start.bat config\server.properties` (in a seperate shell)
+4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic`
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+In this example, we create a topic called **demo_topic**
 
----
 
-## Create a file
+# Start the producer and consumer
 
-Next, you’ll add a new file to this repository.
+5.  `cd <directory cloned project>`
+6. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar -s consumer -c resources\checkpoint -o resources\results.csv -t demo_topic` (in a seperate shell)
+7. `java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar -s producer -i resources\transactions.csv -t demo_topic ` (in a seperate shell)
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+**resources\checkpoint** is a path to a non-existent folder which will be created in run time. The consumer will store its state in the checkpoint folder. If the process is killed and restarted with the same checkpoint folder,
+it will pick up where it left off.
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+## Usage
+`>java -jar target\demo.spark.josi-0.1-jar-with-dependencies.jar`
 
----
+`usage: spark-kafka-demo-app`
 
-## Clone a repository
-
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
-
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
-
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+ `-c,--checkpoint <arg>   The checkpoint option: path of directory used to
+                         save the consumer state`
+                         
+ `-i,--input <arg>        The input option: path of file containing the
+                         transactions`
+                         
+ `-o,--output <arg>       The output option: path of file used to save the
+                         aggregations`
+ `-p,--properties <arg>   The properties option: path of file containing
+                         additional streaming properties to overwrite
+                         default consumer or producer properties`
+                         
+ `-s,--type <arg>         The stream type option - possible tyes:
+                         'consumer','producer'`
+                         
+ `-t,--topic <arg>        The topic option: a kafka topic`
+ 
+ # Screenshots
+ 
+ ### Example output
+ 
+ ![picture](screenshots/example_output.png)
+ 
+ 
+ ### Restart consumer
+ 
+ ![picture](screenshots/consumer_continues_where_it_left_off.png)
+ 
+ 
+ ### Final state (all txs consumed)
+ 
+ ![picture](screenshots/final_state.png)
