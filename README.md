@@ -15,7 +15,7 @@ The **resources** directory contains the following files:
 This project is built and packaged using Maven 3.3.9.
 To generate an executable jar, execute the following Maven command in the cloned directory: 
 ´mvn clean compile assembly:single´
-The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
+The **target** directory contains a jar including all dependencies: **demo.spark.josi-0.1-jar-with-dependencies**
 
 However, you can also run the application using the mvn-exec-plugin by using the following commands.
 
