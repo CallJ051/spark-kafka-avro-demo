@@ -13,9 +13,16 @@ The **resources** directory contains the following files:
 3. ***output.csv***: an output example
 
 This project is built and packaged using Maven 3.3.9.
-The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
-To generate the jar, execute the following Maven command in the cloned directory: 
+To generate an executable jar, execute the following Maven command in the cloned directory: 
 ´mvn clean compile assembly:single´
+The **target** directory contains a jar including all dependencies: ´demo.spark.josi-0.1-jar-with-dependencies´
+
+However, you can also run the application using the mvn-exec-plugin by using the following commands.
+
+1.  `mvn clean install`
+2.  `mvn exec:java -D"exec.args=<YOUR ARGUMENTS>"`
+
+This readme assumes the user uses executes the jar, but you can find executions using the mvn-exec-plugin in the **Screenshots** section below.
 
 The **src/main/java/myapp** directory contains four .java files:
 
@@ -73,6 +80,14 @@ it will pick up where it left off.
 ### Final state (all txs consumed)
  
 ![picture](screenshots/final_state.png)
+
+### mvn-exec-plugin execution for a producer
+ 
+![picture](screenshots/mvn_producer.png)
+
+### mvn-exec-plugin execution for a consumer (in which results are stored in the parent directory)
+ 
+![picture](screenshots/mvn_consumer.png)
 
 
 # Usage
