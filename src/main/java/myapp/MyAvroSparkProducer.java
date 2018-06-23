@@ -39,18 +39,17 @@ public class MyAvroSparkProducer {
     private static  Producer<Long, byte[]> producer;
     private static Random rnd = new Random(SEED);
     
-    public static String PRODUCER_PROPERTIES="src/main/resources/producer.properties";
-    
+   
     //Main method for testing purposes
      public static void main(String... args) throws InterruptedException, IOException{
-        execute(null, App.TRANSACTIONS);
+        execute(null, App.TRANSACTIONS,"test");
     }
     
 
     //based on https://www.tutorialkart.com/apache-spark/read-input-text-file-to-rdd-example/
-    public static void execute(String pathProperties, String pathTransactions) throws InterruptedException {
+    public static void execute(String pathProperties, String pathTransactions, String topic) throws InterruptedException {
         SparkConf sparkConf = new SparkConf()
-                .setAppName("Read Text to RDD")
+                .setAppName("KafkaSparkProducer")
                 .setMaster("local[*]").set("spark.executor.memory", "2g");
         // start a spark context
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
@@ -60,32 +59,33 @@ public class MyAvroSparkProducer {
         JavaRDD<String> lines = sc.textFile(pathTransactions);
 
         // get kafka producer
-        producer= new KafkaProducer<>(Util.getProperties(PRODUCER_PROPERTIES,pathProperties));
+        producer= new KafkaProducer<>(Util.getProperties(App.PRODUCER_PROPERTIES,pathProperties));
 
         
 
         // collect RDD for printing
         lines.foreach(line -> {
-            produceTransaction(line);
+            produceTransaction(line,topic);
         });
 
         producer.close();
 
     }
 
-    public static void produceTransaction( String line) throws InterruptedException {
-        Thread.sleep(rnd.nextInt(MAX_MILLI_SECONDS));
-        ZonedDateTime now = ZonedDateTime.now();
-        System.out.printf("Sending %s at %s  \n",line,DateTimeFormatter.ofPattern("hh:mm:ss").format(now));
-        String[] splitted = line.split(",");
+    public static void produceTransaction( String line,String topic) throws InterruptedException {
+        Thread.sleep(rnd.nextInt(MAX_MILLI_SECONDS));//wait max MAX_MILLI_SECONDS milliseconds
+        ZonedDateTime now = ZonedDateTime.now();//save transaction timestamp
+        System.out.printf("Sending %s at %s  \n",line,DateTimeFormatter.ofPattern("hh:mm:ss").format(now));//Print transaction sent to kafka stream
+        String[] splitted = line.split(",");//split transaction
 
         GenericData.Record avroRecord = new GenericData.Record(schema);
+        
+        //convert transaction line to avro record
+        avroRecord.put(Util.DISTRIBUTOR_ID, splitted[0]);
+        avroRecord.put(Util.POS_ID, splitted[1]);
+        avroRecord.put(Util.VALUE, Double.valueOf(splitted[2]));
 
-        avroRecord.put("str1", splitted[0]);
-        avroRecord.put("str2", splitted[1]);
-        avroRecord.put("int1", Integer.valueOf(splitted[2]));
-
-        producer.send(new ProducerRecord<Long, byte[]>("test", now.toEpochSecond(), recordInjection.apply(avroRecord)));
+        producer.send(new ProducerRecord<Long, byte[]>(topic, now.toEpochSecond(), recordInjection.apply(avroRecord)));//send avro serialized transaction to kafka stream with timestamp as key
     }
 
 }

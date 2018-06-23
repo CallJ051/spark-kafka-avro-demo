@@ -18,13 +18,17 @@ import java.util.stream.Stream;
  */
 public class Util {
     
+    
+    public static String DISTRIBUTOR_ID = "DISTRIBUTOR_ID";
+    public static String POS_ID= "POS_ID";
+    public static String VALUE = "VALUE";
     public static final String SCHEMA = "{"
             + "\"type\":\"record\","
             + "\"name\":\"myrecord\","
             + "\"fields\":["
-            + "  { \"name\":\"str1\", \"type\":\"string\" },"
-            + "  { \"name\":\"str2\", \"type\":\"string\" },"
-            + "  { \"name\":\"int1\", \"type\":\"int\" }"
+            + "  { \"name\":\""+DISTRIBUTOR_ID+"\", \"type\":\"string\" },"
+            + "  { \"name\":\""+POS_ID+"\", \"type\":\"string\" },"
+            + "  { \"name\":\""+VALUE+"\", \"type\":\"double\" }"
             + "]}";
     
 
@@ -42,7 +46,7 @@ public class Util {
 
     }
     
-    public static Properties getProperties(String... paths){
+    public static Properties getProperties(String... paths){ //get properties 
         
         Properties props = new Properties();
         for(String p:paths){
