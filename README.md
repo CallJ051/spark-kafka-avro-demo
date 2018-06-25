@@ -1,6 +1,6 @@
 # Processing transactions using Kafka, Spark and Avro
 
-This Java example how to produce and consume data to and from Kafka. Data is serialized and deserialized using Avro. Apache Spark is used to process the data before sending it to and when reading from the Kafka data stream.
+This Java example shows how to produce and consume data to and from Kafka. Data is serialized and deserialized using Avro. Apache Spark is used to process the data before sending it to and when reading from the Kafka data stream.
 The use case in this example is the processing of transactions. These are sent to a Kafka stream using random intervals (max. 5 seconds). Another process calculates the sum per distributor over a 3 second window and stores the ongoing accumulation in another file.
 This process should pick up where it left off in case it crashes and needs to restart.
 
