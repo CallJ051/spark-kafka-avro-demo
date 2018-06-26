@@ -29,7 +29,7 @@ The **src/main/java/myapp** directory contains four .java files:
 1. ***App.java***: contains UI-logic
 2. ***MyAvroSparkProducer.java***: implementation of the producer
 3. ***MyAvroSparkConsumer.java***: implementation of the consumer
-4. ***Util.java***: A utility class containing the used Avro schema
+4. ***Util.java***: An utility class containing the used Avro schema
 
 ## Prerequisites
 - Java 8 (or higher)
