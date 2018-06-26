@@ -48,9 +48,9 @@ The default producer and consumer properties used in this example can be found i
 # Start Zookeeper and Kafka
 Execute following commands in your %kafka_home% directory. `> cd %KAFKA_HOME% `
 
-2. `> bin\windows\zookeeper-server-start config\zookeeper.properties` (in a seperate shell)
-3. `> bin\windows\kafka-server-start.bat config\server.properties` (in a seperate shell)
-4. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic`
+1. `> bin\windows\zookeeper-server-start config\zookeeper.properties` (in a seperate shell)
+2. `> bin\windows\kafka-server-start.bat config\server.properties` (in a seperate shell)
+3. `> bin\windows\kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic demo_topic`
 
 In this example, we create a topic called **demo_topic**
 
